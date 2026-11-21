@@ -15,7 +15,7 @@
         body {
             background-color: #0d0d1a; 
             color: white;
-            font-family: 'Courier New', Courier, monospace; /* Mas bagay ang font na ito sa typewriter */
+            font-family: 'Courier New', Courier, monospace; 
             display: flex;
             justify-content: center;
             align-items: center;
@@ -38,6 +38,20 @@
             0% { transform: translateY(0) rotate(0deg); opacity: 0; }
             10% { opacity: 0.8; }
             100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* BAGONG DAGDAG: Explosion Hearts */
+        .explosion-heart {
+            position: absolute;
+            font-size: 30px;
+            pointer-events: none;
+            z-index: 100;
+            animation: explode 1s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(1.5); opacity: 0; }
         }
 
         .scene {
@@ -176,37 +190,10 @@
             border: 3px solid #ffb6c1;
         }
 
-        /* BAGONG DESIGN PARA SA TYPEWRITER */
-        .letter-card h3 { 
-            font-size: 16px; 
-            margin-bottom: 5px; 
-            color: #d13bfa; 
-            text-align: left;
-        }
-        
-        .typed-text { 
-            font-size: 12px; 
-            line-height: 1.4; 
-            text-align: left;
-            min-height: 40px; /* Para hindi gumalaw ang layout habang nagta-type */
-        }
-
-        /* Cursor effect (yung kumikislap na guhit) */
-        .cursor {
-            display: inline-block;
-            width: 2px;
-            height: 14px;
-            background-color: #333;
-            animation: blink-cursor 0.7s infinite;
-            vertical-align: middle;
-            margin-left: 2px;
-        }
-
-        @keyframes blink-cursor {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
+        .letter-card h3 { font-size: 16px; margin-bottom: 5px; color: #d13bfa; text-align: left; }
+        .typed-text { font-size: 12px; line-height: 1.4; text-align: left; min-height: 40px; }
+        .cursor { display: inline-block; width: 2px; height: 14px; background-color: #333; animation: blink-cursor 0.7s infinite; vertical-align: middle; margin-left: 2px; }
+        @keyframes blink-cursor { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .signature { font-size: 11px; font-style: italic; color: #888; text-align: right; margin-top: 10px; }
 
         /* ANIMATION STATES */
@@ -243,11 +230,8 @@
 
         <div class="letter-card">
             <img src="picture.jpg" alt="Our Picture" class="photo-frame">
-            
             <h3>Dear Jellieann,</h3>
-            <!-- Dito lalabas ang typewriter text -->
             <p class="typed-text"><span id="typing-span"></span><span class="cursor"></span></p>
-            
             <p class="signature">- Rommel</p>
         </div>
 
@@ -261,7 +245,6 @@
         const music = document.getElementById('bg-music');
         const typingSpan = document.getElementById('typing-span');
 
-        // Eto yung mensaheng ipi-type
         const message = "Hindi man ito espesyal na araw, pero para sa akin, espesyal ka araw-araw. I like you just the way you are. Happy month!";
 
         function createPetals() {
@@ -280,16 +263,50 @@
 
         createPetals(); 
 
-        // Function para sa Typewriter
         function typeWriter(text, i, fnCallback) {
             if (i < (text.length)) {
-                typingSpan.innerHTML = text.substring(0, i+1); // Nagdadagdag ng isang letra
+                typingSpan.innerHTML = text.substring(0, i+1); 
                 setTimeout(function() {
                     typeWriter(text, i + 1, fnCallback)
-                }, 50); // Bilis ng pag-type (50ms)
+                }, 50); 
             }
             else if (typeof fnCallback == 'function') {
-                setTimeout(fnCallback, 700); // Hintayin bago tapusin
+                setTimeout(fnCallback, 700); 
+            }
+        }
+
+        // BAGONG FUNCTION PARA SA EXPLOSION
+        function createExplosion() {
+            const heartEmojis = ['💖', '💜', '💗', '❤️', '✨'];
+            
+            // Gagawa tayo ng 30 puso na sasabog
+            for (let i = 0; i < 30; i++) {
+                const explosionHeart = document.createElement('div');
+                explosionHeart.classList.add('explosion-heart');
+                explosionHeart.innerText = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+                
+                // Ilalagay natin sa gitna ng envelope
+                explosionHeart.style.left = '50%';
+                explosionHeart.style.bottom = '20%'; 
+
+                // Random na direksyon (pataas, pababa, pakaliwa, pakanan)
+                const angle = Math.random() * Math.PI * 2; 
+                const distance = Math.random() * 200 + 100; // 100px to 300px ang layo
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+
+                // I-set ang CSS variables para sa animation
+                explosionHeart.style.setProperty('--tx', tx + 'px');
+                explosionHeart.style.setProperty('--ty', ty + 'px');
+
+                // Random na laki
+                const scale = Math.random() * 1 + 0.5;
+                explosionHeart.style.fontSize = (scale * 20) + 'px';
+
+                document.body.appendChild(explosionHeart);
+
+                // Burahin pagkatapos ng animation para hindi mag-clutter
+                setTimeout(() => { explosionHeart.remove(); }, 1000);
             }
         }
 
@@ -309,12 +326,15 @@
             title.style.transition = "opacity 0.3s";
             title.style.opacity = "0"; 
             
-            // Simulan ang typewriter pagbukas ng envelope (may 1 sec delay)
+            // Simulan ang typewriter (may 800ms delay para hintayin mabukas ang envelope)
             setTimeout(() => {
                 typeWriter(message, 0, function() {
                     console.log("Tapos na mag-type!");
                 });
             }, 800);
+
+            // Simulan ang pagsabog ng puso (kaagad pag clinick)
+            createExplosion();
         });
     </script>
 
