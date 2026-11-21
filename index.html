@@ -149,12 +149,12 @@
         /* STAGE 3: THE LETTER CARD */
         .letter-card {
             position: absolute;
-            bottom: 20%;
+            bottom: 10%; /* Inusog natin pataas ng konti para magkasya ang picture */
             width: 280px;
-            height: 220px;
+            height: 320px; /* Pinalaki natin ang card */
             background: #fffaf0;
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
             color: #333;
             text-align: center;
             opacity: 0;
@@ -165,10 +165,19 @@
             z-index: 1;
         }
 
-        .letter-card h3 { font-size: 18px; margin-bottom: 10px; color: #d13bfa; }
-        .letter-card p { font-size: 12px; margin-bottom: 15px; line-height: 1.5; }
-        .bears { font-size: 60px; margin: 15px 0; }
-        .signature { font-size: 12px; font-style: italic; color: #888; }
+        /* BAGONG DAGDAG: Design para sa Picture */
+        .photo-frame {
+            width: 100%;
+            height: 150px;
+            object-fit: cover; /* Para hindi mabatak ang picture */
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 3px solid #ffb6c1;
+        }
+
+        .letter-card h3 { font-size: 16px; margin-bottom: 5px; color: #d13bfa; }
+        .letter-card p { font-size: 11px; margin-bottom: 10px; line-height: 1.4; }
+        .signature { font-size: 11px; font-style: italic; color: #888; }
 
         /* ANIMATION STATES */
         .scene.step-2 .heart-btn { opacity: 0; transform: scale(0); animation: none; }
@@ -176,16 +185,15 @@
         .scene.step-2 .envelope-btn { opacity: 1; transform: scale(1); transition-delay: 0.5s; }
         .scene.step-2 .tap-hint { opacity: 1; transition-delay: 1s; }
 
-        .scene.step-3 .bouquet { transform: scale(0.8) translateY(-30px); }
+        .scene.step-3 .bouquet { transform: scale(0.8) translateY(-40px); }
         .scene.step-3 .envelope-btn::before { transform: rotateX(180deg); }
         .scene.step-3 .envelope-heart { opacity: 0; }
-        .scene.step-3 .letter-card { opacity: 1; transform: translateY(-50px) scale(1); z-index: 5; transition-delay: 0.3s; }
+        .scene.step-3 .letter-card { opacity: 1; transform: translateY(-80px) scale(1); z-index: 5; transition-delay: 0.3s; }
         .scene.step-3 .tap-hint { opacity: 0; }
     </style>
 </head>
 <body>
 
-    <!-- Background Music -->
     <audio id="bg-music" loop>
         <source src="music.mp3" type="audio/mpeg">
     </audio>
@@ -194,10 +202,7 @@
         
         <div class="title-text" id="title">Para kay Jellieann 💜</div>
         
-        <!-- Step 1: Heart -->
         <div class="heart-btn" id="heart">💜</div>
-
-        <!-- Step 2: Flowers & Envelope -->
         <div class="bouquet">💐</div>
         
         <div class="envelope-btn" id="envelope">
@@ -206,12 +211,14 @@
         
         <div class="tap-hint" id="hint">Tap the envelope</div>
 
-        <!-- Step 3: The Letter -->
+        <!-- Step 3: The Letter with Picture -->
         <div class="letter-card">
+            <!-- Dito natin nilagay ang picture mo. Siguraduhing picture.jpg ang filename sa github -->
+            <img src="picture.jpg" alt="Our Picture" class="photo-frame">
+            
             <h3>Dear Jellieann,</h3>
-            <p>Hindi man ito espesyal na araw, pero para sa akin, espesyal ka araw-araw. Gusto ko lang sabihin na...</p>
-            <div class="bears">🧸💖🐻</div>
-            <p class="signature">I like you just the way you are. Happy month! </p>
+            <p>Hindi man ito espesyal na araw, pero para sa akin, espesyal ka araw-araw.</p>
+            <p class="signature">I like you just the way you are. Happy month! - Rommel</p>
         </div>
 
     </div>
@@ -223,7 +230,6 @@
         const title = document.getElementById('title');
         const music = document.getElementById('bg-music');
 
-        // Function para gumawa ng falling petals sa background
         function createPetals() {
             const petalEmojis = ['🌸', '✨', '🌺', '💜'];
             setInterval(() => {
@@ -239,9 +245,8 @@
             }, 300); 
         }
 
-        createPetals(); // Start petals
+        createPetals(); 
 
-        // Event 1: Pindot sa Puso
         heart.addEventListener('click', () => {
             scene.classList.add('step-2');
             title.innerText = "Flowers For You";
@@ -249,12 +254,10 @@
             title.style.top = "5%";
             title.style.fontStyle = "italic";
             
-            // I-play ang music (naka-loop)
             music.volume = 0.5; 
             music.play().catch(err => console.log("Autoplay blocked:", err));
         });
 
-        // Event 2: Pindot sa Envelope
         envelope.addEventListener('click', () => {
             scene.classList.add('step-3');
             title.style.transition = "opacity 0.3s";
