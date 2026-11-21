@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gift For Her</title>
+    <title>Gift For Jellieann</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            -webkit-tap-highlight-color: transparent; /* Inaalis ang blue highlight pag clinick sa phone */
+            -webkit-tap-highlight-color: transparent; 
         }
 
         body {
@@ -21,6 +21,23 @@
             align-items: center;
             height: 100vh;
             overflow: hidden;
+            position: relative;
+        }
+
+        /* Falling Petals Effect Background */
+        .petal {
+            position: absolute;
+            top: -20px;
+            font-size: 20px;
+            opacity: 0;
+            animation: fall linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
         }
 
         .scene {
@@ -31,6 +48,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            z-index: 10;
         }
 
         .title-text {
@@ -42,10 +60,10 @@
             transition: all 0.5s ease;
             text-align: center;
             width: 100%;
-            z-index: 10;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
 
-        /* --- STAGE 1: HEART --- */
+        /* STAGE 1: HEART */
         .heart-btn {
             font-size: 120px;
             cursor: pointer;
@@ -53,7 +71,8 @@
             animation: beat 1.5s infinite;
             transition: all 0.5s ease;
             position: absolute;
-            padding: 50px; /* Malaking pindutan */
+            padding: 50px;
+            user-select: none;
         }
 
         @keyframes beat {
@@ -61,7 +80,7 @@
             50% { transform: scale(1.1); }
         }
 
-        /* --- STAGE 2: FLOWERS & ENVELOPE --- */
+        /* STAGE 2: FLOWERS & ENVELOPE */
         .bouquet {
             position: absolute;
             top: 25%;
@@ -70,14 +89,14 @@
             transform: scale(0) translateY(50px);
             transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             filter: drop-shadow(0 0 30px rgba(209, 59, 250, 0.6));
+            user-select: none;
         }
 
-        /* Pinalaki at ginawang madaling pindutin */
         .envelope-btn {
             position: absolute;
             bottom: 15%;
-            width: 200px; /* Mas malaki */
-            height: 140px; /* Mas malaki */
+            width: 200px; 
+            height: 140px; 
             background: #ffb6c1;
             border-radius: 10px;
             cursor: pointer;
@@ -92,12 +111,11 @@
             border: 3px solid #ff8da1;
         }
 
-        /* Triangle flap ng envelope */
         .envelope-btn::before {
             content: '';
             position: absolute;
             top: 0;
-            border-left: 100px solid transparent; /* Sinunod sa lapad */
+            border-left: 100px solid transparent; 
             border-right: 100px solid transparent;
             border-top: 70px solid #ff8da1;
             border-radius: 10px 10px 0 0;
@@ -112,7 +130,6 @@
             transition: opacity 0.3s;
         }
 
-        /* Instruction para sa user */
         .tap-hint {
             position: absolute;
             bottom: 5%;
@@ -121,6 +138,7 @@
             opacity: 0;
             transition: opacity 0.5s;
             animation: blink 1.5s infinite;
+            font-style: italic;
         }
 
         @keyframes blink {
@@ -128,15 +146,15 @@
             50% { opacity: 1; }
         }
 
-        /* --- STAGE 3: THE LETTER CARD --- */
+        /* STAGE 3: THE LETTER CARD */
         .letter-card {
             position: absolute;
             bottom: 20%;
             width: 280px;
-            height: 200px;
+            height: 220px;
             background: #fffaf0;
             border-radius: 10px;
-            padding: 15px;
+            padding: 20px;
             color: #333;
             text-align: center;
             opacity: 0;
@@ -147,59 +165,34 @@
             z-index: 1;
         }
 
-        .letter-card h3 { font-size: 16px; margin-bottom: 5px; color: #d13bfa; }
-        .letter-card p { font-size: 11px; margin-bottom: 10px; line-height: 1.4; }
-        .bears { font-size: 50px; margin: 10px 0; }
-        .signature { font-size: 11px; font-style: italic; color: #888; }
+        .letter-card h3 { font-size: 18px; margin-bottom: 10px; color: #d13bfa; }
+        .letter-card p { font-size: 12px; margin-bottom: 15px; line-height: 1.5; }
+        .bears { font-size: 60px; margin: 15px 0; }
+        .signature { font-size: 12px; font-style: italic; color: #888; }
 
-        /* --- ANIMATION STATES --- */
+        /* ANIMATION STATES */
+        .scene.step-2 .heart-btn { opacity: 0; transform: scale(0); animation: none; }
+        .scene.step-2 .bouquet { opacity: 1; transform: scale(1) translateY(0); }
+        .scene.step-2 .envelope-btn { opacity: 1; transform: scale(1); transition-delay: 0.5s; }
+        .scene.step-2 .tap-hint { opacity: 1; transition-delay: 1s; }
 
-        /* Pag clinick sa Heart */
-        .scene.step-2 .heart-btn {
-            opacity: 0;
-            transform: scale(0);
-            animation: none;
-        }
-        .scene.step-2 .bouquet {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-        }
-        .scene.step-2 .envelope-btn {
-            opacity: 1;
-            transform: scale(1);
-            transition-delay: 0.5s; 
-        }
-        .scene.step-2 .tap-hint {
-            opacity: 1;
-            transition-delay: 1s;
-        }
-
-        /* Pag clinick sa Envelope */
-        .scene.step-3 .bouquet {
-            transform: scale(0.8) translateY(-30px);
-        }
-        .scene.step-3 .envelope-btn::before {
-            transform: rotateX(180deg);
-        }
-        .scene.step-3 .envelope-heart {
-            opacity: 0; 
-        }
-        .scene.step-3 .letter-card {
-            opacity: 1;
-            transform: translateY(-50px) scale(1); 
-            z-index: 5; 
-            transition-delay: 0.3s;
-        }
-        .scene.step-3 .tap-hint {
-            opacity: 0;
-        }
+        .scene.step-3 .bouquet { transform: scale(0.8) translateY(-30px); }
+        .scene.step-3 .envelope-btn::before { transform: rotateX(180deg); }
+        .scene.step-3 .envelope-heart { opacity: 0; }
+        .scene.step-3 .letter-card { opacity: 1; transform: translateY(-50px) scale(1); z-index: 5; transition-delay: 0.3s; }
+        .scene.step-3 .tap-hint { opacity: 0; }
     </style>
 </head>
 <body>
 
+    <!-- Background Music -->
+    <audio id="bg-music" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
     <div class="scene" id="main-scene">
         
-        <div class="title-text" id="title">TAP TO OPEN</div>
+        <div class="title-text" id="title">Para kay Jellieann 💜</div>
         
         <!-- Step 1: Heart -->
         <div class="heart-btn" id="heart">💜</div>
@@ -207,7 +200,6 @@
         <!-- Step 2: Flowers & Envelope -->
         <div class="bouquet">💐</div>
         
-        <!-- Pinalaking Envelope Button -->
         <div class="envelope-btn" id="envelope">
             <div class="envelope-heart">💗</div>
         </div>
@@ -216,10 +208,10 @@
 
         <!-- Step 3: The Letter -->
         <div class="letter-card">
-            <h3>Dear Love,</h3>
-            <p>Today is not a special date, but for me it is a unique day.</p>
+            <h3>Dear Jellieann,</h3>
+            <p>Hindi man ito espesyal na araw, pero para sa akin, espesyal ka araw-araw. Gusto ko lang sabihin na...</p>
             <div class="bears">🧸💖🐻</div>
-            <p class="signature">I like you just the way you are. Happy month.</p>
+            <p class="signature">I like you just the way you are. Happy month! </p>
         </div>
 
     </div>
@@ -229,7 +221,25 @@
         const heart = document.getElementById('heart');
         const envelope = document.getElementById('envelope');
         const title = document.getElementById('title');
-        const hint = document.getElementById('hint');
+        const music = document.getElementById('bg-music');
+
+        // Function para gumawa ng falling petals sa background
+        function createPetals() {
+            const petalEmojis = ['🌸', '✨', '🌺', '💜'];
+            setInterval(() => {
+                const petal = document.createElement('div');
+                petal.classList.add('petal');
+                petal.innerText = petalEmojis[Math.floor(Math.random() * petalEmojis.length)];
+                petal.style.left = Math.random() * 100 + 'vw';
+                petal.style.animationDuration = Math.random() * 3 + 3 + 's'; 
+                petal.style.fontSize = Math.random() * 20 + 10 + 'px';
+                document.body.appendChild(petal);
+                
+                setTimeout(() => { petal.remove(); }, 6000);
+            }, 300); 
+        }
+
+        createPetals(); // Start petals
 
         // Event 1: Pindot sa Puso
         heart.addEventListener('click', () => {
@@ -238,13 +248,15 @@
             title.style.color = "#d13bfa";
             title.style.top = "5%";
             title.style.fontStyle = "italic";
-            title.style.textShadow = "0 0 10px #d13bfa";
+            
+            // I-play ang music (naka-loop)
+            music.volume = 0.5; 
+            music.play().catch(err => console.log("Autoplay blocked:", err));
         });
 
-        // Event 2: Pindot sa Envelope (Kahit saan parte ng envelope pindutin, gagana)
+        // Event 2: Pindot sa Envelope
         envelope.addEventListener('click', () => {
             scene.classList.add('step-3');
-            title.innerText = "A Message For You";
             title.style.transition = "opacity 0.3s";
             title.style.opacity = "0"; 
         });
