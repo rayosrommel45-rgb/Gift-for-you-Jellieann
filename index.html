@@ -15,7 +15,7 @@
         body {
             background-color: #0d0d1a; 
             color: white;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Courier New', Courier, monospace; /* Mas bagay ang font na ito sa typewriter */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -61,6 +61,7 @@
             text-align: center;
             width: 100%;
             text-shadow: 0 0 10px rgba(255,255,255,0.3);
+            font-family: Arial, sans-serif;
         }
 
         /* STAGE 1: HEART */
@@ -139,6 +140,7 @@
             transition: opacity 0.5s;
             animation: blink 1.5s infinite;
             font-style: italic;
+            font-family: Arial, sans-serif;
         }
 
         @keyframes blink {
@@ -149,9 +151,9 @@
         /* STAGE 3: THE LETTER CARD */
         .letter-card {
             position: absolute;
-            bottom: 10%; /* Inusog natin pataas ng konti para magkasya ang picture */
+            bottom: 10%;
             width: 280px;
-            height: 320px; /* Pinalaki natin ang card */
+            height: 320px;
             background: #fffaf0;
             border-radius: 10px;
             padding: 15px;
@@ -165,19 +167,47 @@
             z-index: 1;
         }
 
-        /* BAGONG DAGDAG: Design para sa Picture */
         .photo-frame {
             width: 100%;
             height: 150px;
-            object-fit: cover; /* Para hindi mabatak ang picture */
+            object-fit: cover; 
             border-radius: 8px;
             margin-bottom: 10px;
             border: 3px solid #ffb6c1;
         }
 
-        .letter-card h3 { font-size: 16px; margin-bottom: 5px; color: #d13bfa; }
-        .letter-card p { font-size: 11px; margin-bottom: 10px; line-height: 1.4; }
-        .signature { font-size: 11px; font-style: italic; color: #888; }
+        /* BAGONG DESIGN PARA SA TYPEWRITER */
+        .letter-card h3 { 
+            font-size: 16px; 
+            margin-bottom: 5px; 
+            color: #d13bfa; 
+            text-align: left;
+        }
+        
+        .typed-text { 
+            font-size: 12px; 
+            line-height: 1.4; 
+            text-align: left;
+            min-height: 40px; /* Para hindi gumalaw ang layout habang nagta-type */
+        }
+
+        /* Cursor effect (yung kumikislap na guhit) */
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 14px;
+            background-color: #333;
+            animation: blink-cursor 0.7s infinite;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+
+        @keyframes blink-cursor {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .signature { font-size: 11px; font-style: italic; color: #888; text-align: right; margin-top: 10px; }
 
         /* ANIMATION STATES */
         .scene.step-2 .heart-btn { opacity: 0; transform: scale(0); animation: none; }
@@ -211,14 +241,14 @@
         
         <div class="tap-hint" id="hint">Tap the envelope</div>
 
-        <!-- Step 3: The Letter with Picture -->
         <div class="letter-card">
-            <!-- Dito natin nilagay ang picture mo. Siguraduhing picture.jpg ang filename sa github -->
             <img src="picture.jpg" alt="Our Picture" class="photo-frame">
             
             <h3>Dear Jellieann,</h3>
-            <p>Hindi man ito espesyal na araw, pero para sa akin, espesyal ka araw-araw.</p>
-            <p class="signature">I like you just the way you are. Happy month! - Rommel</p>
+            <!-- Dito lalabas ang typewriter text -->
+            <p class="typed-text"><span id="typing-span"></span><span class="cursor"></span></p>
+            
+            <p class="signature">- Rommel</p>
         </div>
 
     </div>
@@ -229,6 +259,10 @@
         const envelope = document.getElementById('envelope');
         const title = document.getElementById('title');
         const music = document.getElementById('bg-music');
+        const typingSpan = document.getElementById('typing-span');
+
+        // Eto yung mensaheng ipi-type
+        const message = "Hindi man ito espesyal na araw, pero para sa akin, espesyal ka araw-araw. I like you just the way you are. Happy month!";
 
         function createPetals() {
             const petalEmojis = ['🌸', '✨', '🌺', '💜'];
@@ -240,12 +274,24 @@
                 petal.style.animationDuration = Math.random() * 3 + 3 + 's'; 
                 petal.style.fontSize = Math.random() * 20 + 10 + 'px';
                 document.body.appendChild(petal);
-                
                 setTimeout(() => { petal.remove(); }, 6000);
             }, 300); 
         }
 
         createPetals(); 
+
+        // Function para sa Typewriter
+        function typeWriter(text, i, fnCallback) {
+            if (i < (text.length)) {
+                typingSpan.innerHTML = text.substring(0, i+1); // Nagdadagdag ng isang letra
+                setTimeout(function() {
+                    typeWriter(text, i + 1, fnCallback)
+                }, 50); // Bilis ng pag-type (50ms)
+            }
+            else if (typeof fnCallback == 'function') {
+                setTimeout(fnCallback, 700); // Hintayin bago tapusin
+            }
+        }
 
         heart.addEventListener('click', () => {
             scene.classList.add('step-2');
@@ -262,6 +308,13 @@
             scene.classList.add('step-3');
             title.style.transition = "opacity 0.3s";
             title.style.opacity = "0"; 
+            
+            // Simulan ang typewriter pagbukas ng envelope (may 1 sec delay)
+            setTimeout(() => {
+                typeWriter(message, 0, function() {
+                    console.log("Tapos na mag-type!");
+                });
+            }, 800);
         });
     </script>
 
