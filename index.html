@@ -13,7 +13,8 @@
         }
 
         body {
-            background-color: #0d0d1a; 
+            /* Pinalitan natin ang background ng gradient na parang night sky */
+            background: linear-gradient(to bottom, #050510 0%, #151530 50%, #2a1b38 100%);
             color: white;
             font-family: 'Courier New', Courier, monospace; 
             display: flex;
@@ -24,14 +25,63 @@
             position: relative;
         }
 
-        /* Falling Petals Effect Background */
+        /* --- STAR BACKGROUND EFFECTS --- */
+        .stars {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 10px white; }
+        }
+
+        /* SHOOTING STAR (BULALAKAW) */
+        .shooting-star {
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
+            opacity: 0;
+        }
+        
+        .shooting-star::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 0;
+            width: 150px;
+            height: 1px;
+            background: linear-gradient(to left, white, transparent);
+            transform: translateY(-50%);
+        }
+
+        @keyframes shoot {
+            0% { transform: translate(0, 0) rotate(-45deg); opacity: 1; }
+            100% { transform: translate(-600px, 600px) rotate(-45deg); opacity: 0; }
+        }
+
+        /* Falling Petals Effect */
         .petal {
             position: absolute;
             top: -20px;
             font-size: 20px;
             opacity: 0;
             animation: fall linear infinite;
-            z-index: 1;
+            z-index: 2;
         }
 
         @keyframes fall {
@@ -40,7 +90,7 @@
             100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
         }
 
-        /* BAGONG DAGDAG: Explosion Hearts */
+        /* Explosion Hearts */
         .explosion-heart {
             position: absolute;
             font-size: 30px;
@@ -74,7 +124,7 @@
             transition: all 0.5s ease;
             text-align: center;
             width: 100%;
-            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+            text-shadow: 0 0 15px rgba(209, 59, 250, 0.8); /* Purple glow sa title */
             font-family: Arial, sans-serif;
         }
 
@@ -82,12 +132,13 @@
         .heart-btn {
             font-size: 120px;
             cursor: pointer;
-            filter: drop-shadow(0 0 20px rgba(209, 59, 250, 0.8));
+            filter: drop-shadow(0 0 25px rgba(209, 59, 250, 1));
             animation: beat 1.5s infinite;
             transition: all 0.5s ease;
             position: absolute;
             padding: 50px;
             user-select: none;
+            z-index: 15;
         }
 
         @keyframes beat {
@@ -105,6 +156,7 @@
             transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             filter: drop-shadow(0 0 30px rgba(209, 59, 250, 0.6));
             user-select: none;
+            z-index: 15;
         }
 
         .envelope-btn {
@@ -121,8 +173,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-            z-index: 2;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+            z-index: 15;
             border: 3px solid #ff8da1;
         }
 
@@ -140,7 +192,7 @@
 
         .envelope-heart {
             font-size: 30px;
-            z-index: 3;
+            z-index: 16;
             margin-top: 30px;
             transition: opacity 0.3s;
         }
@@ -155,6 +207,7 @@
             animation: blink 1.5s infinite;
             font-style: italic;
             font-family: Arial, sans-serif;
+            z-index: 15;
         }
 
         @keyframes blink {
@@ -176,9 +229,9 @@
             opacity: 0;
             transform: translateY(50px) scale(0.8);
             transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
             border: 2px dashed #ffb6c1;
-            z-index: 1;
+            z-index: 12;
         }
 
         .photo-frame {
@@ -205,11 +258,14 @@
         .scene.step-3 .bouquet { transform: scale(0.8) translateY(-40px); }
         .scene.step-3 .envelope-btn::before { transform: rotateX(180deg); }
         .scene.step-3 .envelope-heart { opacity: 0; }
-        .scene.step-3 .letter-card { opacity: 1; transform: translateY(-80px) scale(1); z-index: 5; transition-delay: 0.3s; }
+        .scene.step-3 .letter-card { opacity: 1; transform: translateY(-80px) scale(1); z-index: 20; transition-delay: 0.3s; }
         .scene.step-3 .tap-hint { opacity: 0; }
     </style>
 </head>
 <body>
+
+    <!-- Background Stars Container -->
+    <div class="stars" id="stars-container"></div>
 
     <audio id="bg-music" loop>
         <source src="music.mp3" type="audio/mpeg">
@@ -244,9 +300,38 @@
         const title = document.getElementById('title');
         const music = document.getElementById('bg-music');
         const typingSpan = document.getElementById('typing-span');
+        const starsContainer = document.getElementById('stars-container');
 
         const message = "Hindi man ito espesyal na araw, pero para sa akin, espesyal ka araw-araw. I like you just the way you are. Happy month!";
 
+        // 1. Function para sa Stars at Shooting Stars
+        function createStars() {
+            // Gumawa ng 50 maliliit na bituin
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+                star.style.animationDuration = Math.random() * 2 + 1 + 's';
+                starsContainer.appendChild(star);
+            }
+
+            // Gumawa ng bulalakaw paminsan-minsan
+            setInterval(() => {
+                const shootingStar = document.createElement('div');
+                shootingStar.classList.add('shooting-star');
+                shootingStar.style.left = Math.random() * 50 + 50 + 'vw'; // Sa kanang side
+                shootingStar.style.top = Math.random() * 30 + 'vh'; // Sa taas
+                shootingStar.style.animation = 'shoot 1.5s linear forwards';
+                starsContainer.appendChild(shootingStar);
+                
+                setTimeout(() => { shootingStar.remove(); }, 1500);
+            }, 4000); // Meron every 4 seconds
+        }
+
+        // 2. Function para sa Falling Petals
         function createPetals() {
             const petalEmojis = ['🌸', '✨', '🌺', '💜'];
             setInterval(() => {
@@ -258,58 +343,48 @@
                 petal.style.fontSize = Math.random() * 20 + 10 + 'px';
                 document.body.appendChild(petal);
                 setTimeout(() => { petal.remove(); }, 6000);
-            }, 300); 
+            }, 400); 
         }
 
-        createPetals(); 
-
+        // 3. Function para sa Typewriter
         function typeWriter(text, i, fnCallback) {
             if (i < (text.length)) {
                 typingSpan.innerHTML = text.substring(0, i+1); 
                 setTimeout(function() {
                     typeWriter(text, i + 1, fnCallback)
                 }, 50); 
-            }
-            else if (typeof fnCallback == 'function') {
+            } else if (typeof fnCallback == 'function') {
                 setTimeout(fnCallback, 700); 
             }
         }
 
-        // BAGONG FUNCTION PARA SA EXPLOSION
+        // 4. Function para sa Explosion
         function createExplosion() {
             const heartEmojis = ['💖', '💜', '💗', '❤️', '✨'];
-            
-            // Gagawa tayo ng 30 puso na sasabog
             for (let i = 0; i < 30; i++) {
                 const explosionHeart = document.createElement('div');
                 explosionHeart.classList.add('explosion-heart');
                 explosionHeart.innerText = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
-                
-                // Ilalagay natin sa gitna ng envelope
                 explosionHeart.style.left = '50%';
                 explosionHeart.style.bottom = '20%'; 
-
-                // Random na direksyon (pataas, pababa, pakaliwa, pakanan)
                 const angle = Math.random() * Math.PI * 2; 
-                const distance = Math.random() * 200 + 100; // 100px to 300px ang layo
+                const distance = Math.random() * 200 + 100; 
                 const tx = Math.cos(angle) * distance;
                 const ty = Math.sin(angle) * distance;
-
-                // I-set ang CSS variables para sa animation
                 explosionHeart.style.setProperty('--tx', tx + 'px');
                 explosionHeart.style.setProperty('--ty', ty + 'px');
-
-                // Random na laki
                 const scale = Math.random() * 1 + 0.5;
                 explosionHeart.style.fontSize = (scale * 20) + 'px';
-
                 document.body.appendChild(explosionHeart);
-
-                // Burahin pagkatapos ng animation para hindi mag-clutter
                 setTimeout(() => { explosionHeart.remove(); }, 1000);
             }
         }
 
+        // Start background effects
+        createStars();
+        createPetals();
+
+        // Event Listeners
         heart.addEventListener('click', () => {
             scene.classList.add('step-2');
             title.innerText = "Flowers For You";
@@ -326,14 +401,10 @@
             title.style.transition = "opacity 0.3s";
             title.style.opacity = "0"; 
             
-            // Simulan ang typewriter (may 800ms delay para hintayin mabukas ang envelope)
             setTimeout(() => {
-                typeWriter(message, 0, function() {
-                    console.log("Tapos na mag-type!");
-                });
+                typeWriter(message, 0, function() {});
             }, 800);
 
-            // Simulan ang pagsabog ng puso (kaagad pag clinick)
             createExplosion();
         });
     </script>
