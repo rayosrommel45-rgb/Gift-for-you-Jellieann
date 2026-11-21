@@ -44,7 +44,7 @@
 
         .title-text {
             position: absolute;
-            top: 15%;
+            top: 10%;
             font-size: 24px;
             letter-spacing: 3px;
             font-weight: bold;
@@ -73,7 +73,7 @@
         /* STAGE 2: FLOWERS & ENVELOPE */
         .bouquet {
             position: absolute;
-            top: 25%;
+            top: 20%;
             font-size: 140px;
             opacity: 0;
             transform: scale(0) translateY(50px);
@@ -133,7 +133,8 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.8);
             border: 2px dashed #ffb6c1;
             z-index: 20;
-            cursor: pointer; /* Pwedeng pindutin ang buong card */
+            cursor: pointer;
+            pointer-events: none; /* Hindi pwedeng pindutin habang nakatago */
         }
 
         .photo-frame { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; border: 3px solid #ffb6c1; }
@@ -142,14 +143,15 @@
         .cursor { display: inline-block; width: 2px; height: 14px; background-color: #333; animation: blink-cursor 0.7s infinite; vertical-align: middle; margin-left: 2px; }
         @keyframes blink-cursor { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .signature { font-size: 11px; font-style: italic; color: #888; text-align: right; margin-top: 10px; }
+        .card-hint { font-size: 10px; color: #999; margin-top: 5px; animation: blink 1.5s infinite; }
 
         /* STAGE 4: INTERACTIVE QUESTION (Pop-up style) */
         .question-box {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) scale(0); /* Nakagitna at nakatago sa umpisa */
-            background: rgba(30, 30, 50, 0.95); /* Madilim na box para kitang-kita */
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(30, 30, 50, 0.95);
             backdrop-filter: blur(10px);
             padding: 25px;
             border-radius: 15px;
@@ -157,7 +159,7 @@
             text-align: center;
             opacity: 0;
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 50; /* Pinaka-harap */
+            z-index: 50; 
             width: 280px;
             box-shadow: 0 0 30px rgba(209, 59, 250, 0.5);
         }
@@ -179,20 +181,21 @@
         .btn-no { background: #555; color: white; position: absolute; right: 10px; }
 
         /* ANIMATION STATES */
-        .scene.step-2 .heart-btn { opacity: 0; transform: scale(0); animation: none; }
+        .scene.step-2 .heart-btn { opacity: 0; transform: scale(0); animation: none; pointer-events: none; }
         .scene.step-2 .bouquet { opacity: 1; transform: scale(1) translateY(0); }
-        .scene.step-2 .envelope-btn { opacity: 1; transform: scale(1); transition-delay: 0.5s; }
+        .scene.step-2 .envelope-btn { opacity: 1; transform: scale(1); transition-delay: 0.5s; pointer-events: auto; }
         .scene.step-2 .tap-hint { opacity: 1; transition-delay: 1s; }
 
+        /* Pag clinick ang envelope, lalabas ang card */
         .scene.step-3 .bouquet { transform: scale(0.8) translateY(-40px); }
         .scene.step-3 .envelope-btn::before { transform: rotateX(180deg); }
         .scene.step-3 .envelope-heart { opacity: 0; }
         .scene.step-3 .tap-hint { opacity: 0; }
-        .scene.step-3 .envelope-btn { opacity: 0; pointer-events: none; }
-        .scene.step-3 .letter-card { opacity: 1; transform: translateY(-80px) scale(1); z-index: 30; } /* Lalabas ang Card */
+        .scene.step-3 .envelope-btn { opacity: 0; pointer-events: none; } /* Tinatago natin yung envelope */
+        .scene.step-3 .letter-card { opacity: 1; transform: translateY(-80px) scale(1); z-index: 30; pointer-events: auto; } /* Pinapakita ang card at pinapayagang pindutin */
 
-        /* Pag clinick ang Card, lalabas ang Question Box */
-        .scene.step-4 .question-box { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        /* Pag clinick ang card, lalabas ang Question Box */
+        .scene.step-4 .question-box { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
     </style>
 </head>
 <body>
@@ -222,9 +225,10 @@
             <h3>Dear Jellieann,</h3>
             <p class="typed-text"><span id="typing-span"></span><span class="cursor"></span></p>
             <p class="signature">- Rommel</p>
+            <p class="card-hint">(Tap the card)</p> <!-- HINT PARA ALAM NIYANG PWEDENG PINDUTIN -->
         </div>
 
-        <!-- STAGE 4: THE QUESTION (Nakatago sa umpisa) -->
+        <!-- STAGE 4: THE QUESTION -->
         <div class="question-box" id="question-box">
             <h2>Jellieann, will you be my forever? 🥺💍</h2>
             <div class="btn-group">
@@ -300,7 +304,7 @@
             }
         }
 
-        // 4. Explosion (Sasabog pag clinick ang Yes)
+        // 4. Explosion
         function createExplosion() {
             const heartEmojis = ['💖', '💜', '💗', '❤️', '✨'];
             for (let i = 0; i < 40; i++) {
@@ -341,13 +345,12 @@
             scene.classList.add('step-3'); 
             title.style.opacity = "0"; 
             
-            // Simulan ang typewriter paglabas ng card
             setTimeout(() => {
                 typeWriter(message, 0, function() {});
             }, 800);
         });
 
-        // EVENT 3: Pindot sa Card (Lalabas ang Tanong na Yes/No)
+        // EVENT 3: Pindot sa Card (Lalabas ang Tanong)
         letterCard.addEventListener('click', () => {
             scene.classList.add('step-4');
         });
@@ -365,11 +368,11 @@
             btnNo.style.transform = `translate(${randomX}px, ${randomY}px)`;
         });
 
-        // EVENT 5: Pindot sa "YES" (Sasabog at matatapos)
+        // EVENT 5: Pindot sa "YES" (Explosion)
         btnYes.addEventListener('click', () => {
-            createExplosion(); // Sumabog ang puso
-            document.getElementById('question-box').style.display = 'none'; // Mawawala ang tanong
-            document.getElementById('title').innerText = "Salamat, Jellieann! 💜"; // Bagong title
+            createExplosion(); 
+            document.getElementById('question-box').style.display = 'none'; 
+            document.getElementById('title').innerText = "Salamat, Jellieann! 💜"; 
             document.getElementById('title').style.opacity = "1";
         });
     </script>
